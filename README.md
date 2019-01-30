@@ -10,10 +10,14 @@ BitBar GitLab Plugin, giving access to issues and pipelines.
 
 ## Installation
 
+If you have rvm make sure to first use the system ruby version, as BitBar is using this ruby.
+
+```rvm use system```
+
 First install gem globally.
 
 ```
-sudo gem install bitbar-gitlab
+sudo gem install bitbar_gitlab
 ```
 
 Then run:
@@ -38,7 +42,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/mipmip/bitbar-gitlab. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/mipmip/bitbar_gitlab. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
