@@ -72,11 +72,11 @@ def run
   puts "Toggles"
   toggle_line 1, 'show_starred_projects', "Show starred projects", "Hide starred projects"
   toggle_line 1, 'show_all_projects', "Show all projects", "Hide all projects"
-  puts "#{indent 1}Clear issue focus | bash=~/.BitBar/gitlab-bitbar-lib/shellwrap.sh param1=set param2=pipeline_focus param3=0 terminal=false refresh=true"
-  puts "#{indent 1} ---"
+  puts "#{indent 1}Clear issue focus | bash=#{shellwrap} param1=set param2=pipeline_focus param3=0 terminal=false refresh=true"
+  puts "#{indent 1}---"
   toggle_line 1, 'show_starred_pipelines', "Show starred pipelines", "Hide starred pipelines"
   toggle_line 1, 'show_all_pipelines', "Show all pipelines", "Hide all pipelines"
-  puts "#{indent 1}Clear pipeline focus | bash=~/.BitBar/gitlab-bitbar-lib/shellwrap.sh param1=set param2=pipeline_focus param3=0 terminal=false refresh=true"
+  puts "#{indent 1}Clear pipeline focus | bash=#{shellwrap} param1=set param2=pipeline_focus param3=0 terminal=false refresh=true"
 end
 
 def install_test_gitlab_connection
@@ -105,7 +105,6 @@ def install_test_gitlab_connection
     end
     puts
   end
-
 end
 
 def install_bitbar_symlinks
@@ -160,7 +159,6 @@ if ARGV[0]=='install'
     puts "writing configuration file..."
     puts
     File.open(CONFIG_FILE, 'w') { |file| file.write(newconf.to_yaml) }
-
   end
 
   CONFIG = YAML.load_file(CONFIG_FILE)

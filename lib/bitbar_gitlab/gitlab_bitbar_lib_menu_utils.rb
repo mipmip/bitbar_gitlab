@@ -1,3 +1,7 @@
+def shellwrap
+  "#{CONFIG['EXE_UTIL_DIR']}/shellwrap.sh"
+end
+
 def project_menu pr, level, in_focus = false
   i=0
   data = []
@@ -33,7 +37,7 @@ def project_menu pr, level, in_focus = false
     i+=1
 
     puts "#{indent level}#{d[0]} #{d[1]} #{d[3]}"
-    puts "#{indent (level+1)}Copy | bash=~/.BitBar/gitlab-bitbar-lib/shellwrap.sh param1=copy param2=\"#{d[0]} #{d[1]} #{d[3]}\" terminal=false"
+    puts "#{indent (level+1)}Copy | bash=#{shellwrap} param1=copy param2=\"#{d[0]} #{d[1]} #{d[3]}\" terminal=false"
     puts "#{indent (level+1)}Open issue | href=#{d[2]}"
   end
 end
@@ -78,9 +82,9 @@ def pipeline_menu pr, level, in_focus = false
     i=0
 
     if in_focus
-      puts "#{indent level}Clear focus | bash=~/.BitBar/gitlab-bitbar-lib/shellwrap.sh param1=set param2=pipeline_focus param3=0 terminal=false refresh=true"
+      puts "#{indent level}Clear focus | bash=#{shellwrap} param1=set param2=pipeline_focus param3=0 terminal=false refresh=true"
     else
-      puts "#{indent level}Set Focus | bash=~/.BitBar/gitlab-bitbar-lib/shellwrap.sh param1=set param2=pipeline_focus param3=#{pr.to_hash['id']} terminal=false refresh=true"
+      puts "#{indent level}Set Focus | bash=#{shellwrap} param1=set param2=pipeline_focus param3=#{pr.to_hash['id']} terminal=false refresh=true"
     end
     puts "#{indent level}---"
 
@@ -94,9 +98,9 @@ end
 
 def focus_line level, in_focus, project_id
   if in_focus
-    puts "#{indent level}Clear focus | bash=~/.BitBar/gitlab-bitbar-lib/shellwrap.sh param1=set param2=project_focus param3=0 terminal=false refresh=true"
+    puts "#{indent level}Clear focus | bash=#{shellwrap} param1=set param2=project_focus param3=0 terminal=false refresh=true"
   else
-    puts "#{indent level}Set Focus | bash=~/.BitBar/gitlab-bitbar-lib/shellwrap.sh param1=set param2=project_focus param3=#{project_id} terminal=false refresh=true"
+    puts "#{indent level}Set Focus | bash=#{shellwrap} param1=set param2=project_focus param3=#{project_id} terminal=false refresh=true"
   end
 end
 
@@ -127,7 +131,7 @@ def toggle_line level, key, on_text, off_text
     status=1
   end
 
-  puts "#{indent level}#{text} | bash=~/.BitBar/gitlab-bitbar-lib/shellwrap.sh param1=set param2=TOGGLE_#{key.upcase} param3=#{status.to_s} terminal=false refresh=true"
+  puts "#{indent level}#{text} | bash=#{shellwrap} param1=set param2=TOGGLE_#{key.upcase} param3=#{status.to_s} terminal=false refresh=true"
 end
 
 

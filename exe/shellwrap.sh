@@ -7,7 +7,8 @@ if [[ "$#" -ge 1 ]];then
         echo COPIED "$2"
     fi
     if [[ "$1" == 'set' ]] ; then
-        /usr/bin/ruby ~/.BitBar/gitlab-bitbar-plugin.rb set $2 $3
+        exedir=$(grep EXE_UTIL_DIR ~/.bitbar_gitlab_cnf.yml|cut -d'"' -f2)
+        /usr/bin/ruby $exedir/gitlab-bitbar-plugin.rb set $2 $3
         echo SET "$2 $3"
     fi
 fi
