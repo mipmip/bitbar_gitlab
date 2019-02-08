@@ -1,5 +1,5 @@
 def shellwrap
-  "#{CONFIG['EXE_UTIL_DIR']}/shellwrap.sh"
+  "#{$conf.get_key :exe_util_dir}/shellwrap.sh"
 end
 
 def project_menu pr, level, in_focus = false
@@ -45,7 +45,7 @@ end
 def pipeline_focus_menu pr, level, in_focus = false
 
     data = []
-    labels = ['id', 'status','web_url']
+    labels = ['id','status','web_url']
     $gitlab.pipelines(pr.to_hash['id'].to_s,{per_page:3, page:1, state: 'running'}).collect do |iss|
 
       d = []
@@ -59,6 +59,22 @@ def pipeline_focus_menu pr, level, in_focus = false
     i=0
 
     data.each do |d|
+      if i == 0
+
+        if $last_job_id == d[0] and $last_job_status != d[1]
+            if d[1] == 'success'
+              system "/usr/local/bin/terminal-notifier -title 'GitLab Pipeline Success' -message '#{d[0]} finished successfully' -open '#{d[2]}'"
+            elsif d[1] == 'failed'
+              system "/usr/local/bin/terminal-notifier -title 'GitLab Pipeline Failed' -message '#{d[0]} failed}' -open '#{d[2]}'"
+            end
+
+        end
+
+        $last_job_id = d[0]
+        $last_job_status = d[1]
+
+      end
+
       i+=1
 
       puts "#{indent level}#{d[0]} #{d[1]} | href=#{d[2]}"
@@ -113,17 +129,10 @@ def indent i
   scores
 end
 
-def toggle_on? key
-  if CONFIG['TOGGLE_'+key.upcase] and CONFIG['TOGGLE_'+key.upcase] !=0
-    true
-  else
-    false
-  end
-end
-
 def toggle_line level, key, on_text, off_text
 
-  if CONFIG['TOGGLE_'+key.upcase] && CONFIG['TOGGLE_'+key.upcase]!=0
+  if $conf.toggle_on? key
+  #if CONFIG['TOGGLE_'+key.upcase] && CONFIG['TOGGLE_'+key.upcase]!=0
     text=off_text
     status=0
   else

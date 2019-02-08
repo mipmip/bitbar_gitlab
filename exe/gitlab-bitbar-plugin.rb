@@ -6,16 +6,21 @@ require "bitbar_gitlab"
 require 'yaml'
 require 'gitlab'
 
+#CONFIG_FILE = File.expand_path('~/.bitbar_gitlab_cnf.yml')
+$conf = GitlabBitbarLibConfig.new
+
+
 def run
+
   puts "GitLab"
   puts "---"
 
   puts "Refresh | refresh=true"
 
-  if CONFIG['PROJECT_FOCUS'] and CONFIG['PROJECT_FOCUS']!=0
+  if $conf.key_is_set :project_focus
     puts "---"
 
-    focus_project = $gitlab.project(CONFIG['PROJECT_FOCUS'])
+    focus_project = $gitlab.project($conf.get_key :project_focus)
 
     puts "PROJECT: #{focus_project.to_hash['name']} | href=#{focus_project.to_hash['web_url']}"
     puts "Issues"
@@ -23,19 +28,18 @@ def run
     puts "---"
   end
 
-  if CONFIG['PIPELINE_FOCUS'] and CONFIG['PIPELINE_FOCUS']!=0
+  if $conf.key_is_set :pipeline_focus
     puts "---"
 
-    focus_pipeline = $gitlab.project(CONFIG['PIPELINE_FOCUS'])
+    focus_pipeline = $gitlab.project($conf.get_key :pipeline_focus)
 
-    puts "PIPELINE: #{focus_project.to_hash['name']} | href=#{focus_project.to_hash['web_url']}"
+    puts "PIPELINE: #{focus_pipeline.to_hash['name']} | href=#{focus_pipeline.to_hash['web_url']}"
     pipeline_focus_menu focus_pipeline, 0
 
     puts "---"
   end
 
-
-  if toggle_on? 'show_starred_projects'
+  if $conf.toggle_on? 'show_starred_projects'
     puts "Starred Projects"
 
     $gitlab.projects(per_page: 9999, starred: 1).collect do |pr|
@@ -44,7 +48,7 @@ def run
     end
   end
 
-  if toggle_on? 'show_all_projects'
+  if $conf.toggle_on? 'show_all_projects'
     puts "All Projects"
 
     $gitlab.projects(per_page: 9999).collect do |pr|
@@ -53,14 +57,14 @@ def run
     end
   end
 
-  if toggle_on? 'show_starred_pipelines'
+  if $conf.toggle_on? 'show_starred_pipelines'
     puts "Starred Pipelines"
     $gitlab.projects(per_page: 9999, starred: 1).collect do |pr|
       puts "#{indent 1}" + pr.to_hash['id'].to_s + ' ' + pr.to_hash['name']
       pipeline_menu pr, 2
     end
   end
-  if toggle_on? 'show_all_pipelines'
+  if $conf.toggle_on? 'show_all_pipelines'
     puts "All Pipelines"
     $gitlab.projects(per_page: 9999).collect do |pr|
       puts "#{indent 1}" + pr.to_hash['id'].to_s + ' ' + pr.to_hash['name']
@@ -82,7 +86,7 @@ end
 def install_test_gitlab_connection
   puts "Testing GitLab connection"
 
-  $gitlab = Gitlab.client(endpoint: CONFIG['ENDPOINT'], private_token: CONFIG['TOKEN'])
+  $gitlab = Gitlab.client(endpoint: $conf.get_key(:endpoint), private_token: $conf.get_key(:token))
 
   begin
     user = $gitlab.user
@@ -100,7 +104,7 @@ def install_test_gitlab_connection
     print "Shall I delete it for you? "
     delete_conf = STDIN.gets.chomp.upcase
     if delete_conf == "YES" or delete_conf == "Y"
-      File.delete CONFIG_FILE
+      $conf.delete
       puts "Deleted conf file. You can run this install again"
     end
     puts
@@ -109,18 +113,25 @@ end
 
 def install_bitbar_symlinks
   puts "Installing Symlinks to BitBar plugin folder"
-  if File.exists? File.expand_path(CONFIG['PLUGIN_FOLDER'])+'/gitlab-bitbar-plugin.rb'
-    File.delete File.expand_path(CONFIG['PLUGIN_FOLDER'])+'/gitlab-bitbar-plugin.rb'
+  unless $conf.get_key :plugin_folder
+    plugin_folder = `defaults read com.matryer.BitBar | grep pluginsDirectory | cut -d '"' -f2`.strip
+    $conf.set_key :plugin_folder, plugin_folder
   end
-  File.symlink(File.expand_path(__FILE__), File.expand_path(CONFIG['PLUGIN_FOLDER'])+'/gitlab-bitbar-plugin.rb')
+
+  if File.exists? File.expand_path($conf.get_key :plugin_folder)+'/gitlab-bitbar-plugin.rb'
+    File.delete File.expand_path($conf.get_key :plugin_folder)+'/gitlab-bitbar-plugin.rb'
+  end
+  File.symlink(File.expand_path(__FILE__), File.expand_path($conf.get_key :plugin_folder)+'/gitlab-bitbar-plugin.rb')
 end
 
-CONFIG_FILE =File.expand_path('~/.bitbar_gitlab_cnf.yml')
-
 if ARGV[0]=='install'
+
   puts "Installing BitBar Gitlab Plugin by Pim Snel"
 
-  if File.exists? CONFIG_FILE
+  if $conf.exists?
+    unless $conf.get_key :exe_util_dir
+      $conf.set_key :exe_util_dir, File.dirname(File.expand_path(__FILE__))
+    end
     puts "you seem to have a configations file."
     puts
   else
@@ -158,35 +169,29 @@ if ARGV[0]=='install'
     puts
     puts "writing configuration file..."
     puts
-    File.open(CONFIG_FILE, 'w') { |file| file.write(newconf.to_yaml) }
+    $conf.save_init newconf
   end
 
-  CONFIG = YAML.load_file(CONFIG_FILE)
   install_test_gitlab_connection
   install_bitbar_symlinks
 
+elsif ARGV[0]=='set'
+
+  unless $conf.get_key :exe_util_dir
+    $conf.set_key :exe_util_dir, File.dirname(File.expand_path(__FILE__))
+  end
+
+  $conf.set_key ARGV[1].to_sym, ARGV[2].to_i
 else
-  if File.exists? CONFIG_FILE
 
-    CONFIG = YAML.load_file(CONFIG_FILE)
+  if $conf.exists?
 
-    if ARGV[0]=='set'
-      if ARGV[1] == 'project_focus' && ARGV[2]
-        CONFIG['PROJECT_FOCUS']= ARGV[2].to_i
-        File.open(CONFIG_FILE, 'w') { |file| file.write(CONFIG.to_yaml) }
-      elsif ARGV[1].include?('TOGGLE_') && ARGV[2]
-        CONFIG[ARGV[1]]= ARGV[2].to_i
-        File.open(CONFIG_FILE, 'w') { |file| file.write(CONFIG.to_yaml) }
-      else
-        CONFIG[ARGV[1].upcase]= ARGV[2].to_i
-        File.open(CONFIG_FILE, 'w') { |file| file.write(CONFIG.to_yaml) }
-      end
-
-    else
-      $gitlab = Gitlab.client(endpoint: CONFIG['ENDPOINT'], private_token: CONFIG['TOKEN'])
-      run
+    unless $conf.get_key :exe_util_dir
+      $conf.set_key :exe_util_dir, File.dirname(File.expand_path(__FILE__))
     end
 
+    $gitlab = Gitlab.client(endpoint: $conf.get_key(:endpoint), private_token: $conf.get_key(:token))
+    run
   else
     puts "WARNING, could not execute BITBAR_GITLAB"
     puts
