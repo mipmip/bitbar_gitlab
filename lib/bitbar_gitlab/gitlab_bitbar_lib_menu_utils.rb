@@ -60,12 +60,11 @@ def pipeline_focus_menu pr, level, in_focus = false
 
     data.each do |d|
       if i == 0
-
         if $conf.get_key(:last_job_id) == d[0] and $conf.get_key(:last_job_status) != d[1]
             if d[1] == 'success'
-              system "/usr/local/bin/terminal-notifier -title 'GitLab Pipeline Success' -message '#{d[0]} finished successfully' -open '#{d[2]}'"
+              notify "-title 'GitLab Pipeline Success' -message '#{d[0]} finished successfully' -open '#{d[2]}'"
             elsif d[1] == 'failed'
-              system "/usr/local/bin/terminal-notifier -title 'GitLab Pipeline Failed' -message '#{d[0]} failed' -open '#{d[2]}'"
+              notify "-title 'GitLab Pipeline Failed' -message '#{d[0]} failed' -open '#{d[2]}'"
             end
         end
 

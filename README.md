@@ -13,21 +13,35 @@ BitBar GitLab Plugin, giving access to issues and pipelines.
 If you have rvm make sure to first use the system ruby version, as BitBar is
 using this ruby.
 
-```rvm use system```
+```
+rvm use system
+```
 
 First install gem globally.
 
-``` sudo gem install bitbar_gitlab ```
+```
+sudo gem install bitbar_gitlab
+```
 
 Then run:
 
-``` gitlab-bitbar-plugin.rb install ```
+```
+gitlab-bitbar-plugin.rb install
+```
 
 When finished without problems start BitBar or refresh plugins.
 
 ## Usage
 
 The menu's should be self explaining
+
+## macOS notifications for GitLab CI jobs
+
+If you like to have macOS notifications you must install terminal-notifier with brew.
+
+```
+brew install terminal-notifier
+```
 
 ## Contributing
 
