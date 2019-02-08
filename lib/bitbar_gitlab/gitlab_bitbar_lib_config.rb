@@ -61,6 +61,7 @@ class GitlabBitbarLibConfig
     puts "make sure '~/.bitbar_gitlab_cnf.yml' exists."
     puts "You might want to run 'gitlab-bitbar-plugin.rb install'"
   end
+
   def try_exe_dir_exists
     unless get_key :exe_util_dir
       set_key :exe_util_dir, @exe_dir
