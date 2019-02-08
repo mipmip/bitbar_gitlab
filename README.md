@@ -2,6 +2,18 @@
 
 BitBar GitLab Plugin, giving access to issues and pipelines.
 
+## Features
+
+- Browse project issues
+- Focus project issues
+- Copy issue title to pasteboard
+- New issue in project
+- Show/hide starred projects
+- Show/hide all projects
+- Focus project pipelines
+- Show pipeline status
+- Notify when pipeline has finished
+
 ## Requirements
 
 - macOS
@@ -34,6 +46,8 @@ When finished without problems start BitBar or refresh plugins.
 ## Usage
 
 The menu's should be self explaining
+
+![image](assets/screenie.png)
 
 ## macOS notifications for GitLab CI jobs
 
