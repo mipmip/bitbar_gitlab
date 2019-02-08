@@ -1,6 +1,11 @@
 class GitlabBitbarLibConfig
 
-  def initialize
+  attr_reader :exe_file
+  attr_reader :exe_dir
+
+  def initialize launch_file
+    @exe_dir = File.dirname(File.expand_path(launch_file))
+    @exe_file = File.expand_path(launch_file)
     @config_file= File.expand_path('~/.bitbar_gitlab_cnf.yml')
     load_config if exists?
   end
@@ -50,7 +55,17 @@ class GitlabBitbarLibConfig
     end
   end
 
-
+  def missing_warning
+    puts "WARNING, could not execute BITBAR_GITLAB"
+    puts
+    puts "make sure '~/.bitbar_gitlab_cnf.yml' exists."
+    puts "You might want to run 'gitlab-bitbar-plugin.rb install'"
+  end
+  def try_exe_dir_exists
+    unless get_key :exe_util_dir
+      set_key :exe_util_dir, @exe_dir
+    end
+  end
 
 
 end
