@@ -119,11 +119,14 @@ def pipeline_menu pr, level, in_focus = false
     project_info = $gitlab.project(pr.to_hash['id'].to_s)
     return unless project_info.to_hash['jobs_enabled']
 
+    labels = ['id','status','web_url']
     data = []
-
 
     $gitlab.pipelines(pr.to_hash['id'].to_s,{per_page:3, page:1, state: 'running'}).collect do |iss|
       d = []
+      labels.each do |l|
+        d << iss.to_hash[l].to_s
+      end
       data << d
     end
 
